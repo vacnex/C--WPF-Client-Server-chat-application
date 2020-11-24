@@ -1,5 +1,5 @@
 
-#C# WPF Client-Server chat application
+## C# WPF Client-Server chat application
 A simple Client-Server chat application written in C# &amp; WPF.
 
 ## Contains sample usages of:
