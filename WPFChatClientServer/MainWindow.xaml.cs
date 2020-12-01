@@ -35,11 +35,10 @@ namespace WPFChatClientServer
         {
             InitializeComponent();
             Message.Items.Add("Chat Client");
-
         }
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         {
-                Connect(IPAddress.Parse(ipbox.Text));
+            Connect(IPAddress.Parse(ipbox.Text));
         }
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
@@ -52,12 +51,13 @@ namespace WPFChatClientServer
             {
                 Send();
                 AddMessage(IPHost.HostName.ToString() + ": " + MesssageSend.Text);
-                //Message.Items.MoveCurrentToLast();
-                //Message.ScrollIntoView(Message.Items.CurrentItem);
             }
-            
         }
-
+        
+        /// <summary>
+        /// Hàm khởi tạo kết nối
+        /// </summary>
+        /// <param name="ipaddress">Truyền vào địa chỉ IP</param>
         private void Connect(IPAddress ipaddress)
         {
             IP = new IPEndPoint(ipaddress, 9999);
@@ -67,11 +67,15 @@ namespace WPFChatClientServer
             {
                 sClient.Connect(IP);
                 Growl.SuccessGlobal("Ket Noi thanh cong");
-                sClient.Send(Serialize("Client " + IPHost.HostName.ToString() + " da vao"));
+                foreach (var item in IPHost.AddressList)
+                {
+                    if (item.AddressFamily == AddressFamily.InterNetwork)
+                        sClient.Send(Serialize(item.ToString()));
+                }
+                sClient.Send(Serialize(IPHost.HostName.ToString()+" da ket noi"));
             }
-            catch (Exception e )
+            catch (Exception)
             {
-                Growl.ErrorGlobal("Ket Noi khong thanh cong");
                 return;
             }
             Thread t = new Thread(Recieve);
@@ -79,16 +83,27 @@ namespace WPFChatClientServer
             t.Start();
         }
 
+        /// <summary>
+        /// Hàm đóng kết nối
+        /// </summary>
         private void Close()
         {
             sClient.Close();
         }
 
+
+        /// <summary>
+        /// Hàm gửi
+        /// </summary>
         private void Send()
         {
             sClient.Send(Serialize(IPHost.HostName.ToString() + ": " + MesssageSend.Text));
         }
 
+
+        /// <summary>
+        /// Hàm nhận
+        /// </summary>
         private void Recieve()
         {
             try
@@ -98,19 +113,22 @@ namespace WPFChatClientServer
                     byte[] data = new byte[1024];
                     sClient.Receive(data);
                     String message = (String)Deserialize(data);
-                    if (!message.Contains("\0")) ;
+                    if (!message.Contains("\0"))
                     {
                         AddMessage(message);
                     }
-                    
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Close();
             }
         }
 
+        /// <summary>
+        /// Hàm thêm message vào listbox
+        /// </summary>
+        /// <param name="message">Truyền vào massage</param>
         private void AddMessage(String message)
         {
             this.Dispatcher.Invoke(() => {
@@ -122,28 +140,38 @@ namespace WPFChatClientServer
             
         }
 
+        /// <summary>
+        /// Hàm chuyển đổi đối tượng thành mảng byte
+        /// </summary>
+        /// <param name="obj">Truyền vào object</param>
+        /// <returns>Trả về mảng byte của object</returns>
         private byte[] Serialize(Object obj)
         {
             ms = new MemoryStream();
             BinaryFormatter fn = new BinaryFormatter();
             fn.Serialize(ms, obj);
-
             return ms.ToArray();
-
         }
 
+        /// <summary>
+        /// Hàm chuyển đổi mảng byte về string
+        /// </summary>
+        /// <param name="data">Truyền mảng byte</param>
+        /// <returns></returns>
         private Object Deserialize(byte[] data)
         {
             ms = new MemoryStream(data);
             BinaryFormatter fn = new BinaryFormatter();
             return fn.Deserialize(ms);
         }
-
+        /// <summary>
+        /// Hàm đóng kết nối khi cửa sổ đóng.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_Closed(object sender, EventArgs e)
         {
             Close();
         }
-
-       
     }
 }
