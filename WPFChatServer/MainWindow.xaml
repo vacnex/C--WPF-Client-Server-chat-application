@@ -9,18 +9,29 @@
 
         mc:Ignorable="d"
        WindowStyle="None"
-        WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip" Padding="0" Width="800" Height="600" Closed="Window_Closed">
+        WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip" Padding="0" Width="1000" Height="600" Closed="Window_Closed">
     <Grid Background="{StaticResource CloudDrawingBrush}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="16*"/>
-            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="35*"/>
+            <ColumnDefinition Width="27*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="460*"/>
             <RowDefinition Height="67*"/>
         </Grid.RowDefinitions>
         <ListBox Grid.Row="0" Grid.Column="0"  x:Name="Message" Margin="10" FontSize="22" VerticalContentAlignment="Stretch"/>
-        <ListBox Grid.Row="0" Grid.Column="1"  x:Name="ListClients" Margin="10" FontSize="22" VerticalContentAlignment="Stretch"/>
+        <!--<ListBox Grid.Row="0" Grid.Column="1"  x:Name="ListClients" Margin="10" FontSize="22" VerticalContentAlignment="Stretch"/>-->
+        <DataGrid  Grid.Row="0" Grid.Column="1" x:Name="ListClients"  Margin="10" VerticalContentAlignment="Stretch" HeadersVisibility="All" RowHeaderWidth="60" AutoGenerateColumns="False">
+            <DataGrid.RowHeaderTemplate>
+                <DataTemplate>
+                    <CheckBox IsChecked="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=DataGridRow}}"/>
+                </DataTemplate>
+            </DataGrid.RowHeaderTemplate>
+            <DataGrid.Columns>
+                <DataGridTextColumn IsReadOnly="True"  Binding="{Binding Hostname}" Header="Hostname"/>
+                <DataGridTextColumn IsReadOnly="True" Binding="{Binding Ip}" Header="IP"/>
+            </DataGrid.Columns>
+        </DataGrid>
         <TextBox x:Name="MesssageSend" Grid.Row="1" Grid.Column="0" Margin="10" FontSize="22"/>
         <Button IsDefault="true" x:Name="btnSend" Style="{StaticResource ButtonPrimary}" Content="Send" hc:BorderElement.CornerRadius="10" HorizontalAlignment="Stretch" Grid.Column="1" Grid.Row="1" Margin="10" Click="btnSend_Click" Height="Auto" VerticalAlignment="Stretch" FontSize="22" FontWeight="Bold" />
     </Grid>

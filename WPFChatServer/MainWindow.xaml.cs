@@ -19,6 +19,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WPFChatServer.ClientModel;
+using MessageBox = HandyControl.Controls.MessageBox;
 
 namespace WPFChatServer
 {
@@ -31,6 +33,7 @@ namespace WPFChatServer
         Socket sServer;
         IPEndPoint IP;
         List<Socket> listclient;
+        
         IPHostEntry IPHost;
         public MainWindow()
         {
@@ -46,14 +49,78 @@ namespace WPFChatServer
 
         private void btnSend_Click(object sender, RoutedEventArgs e)
         {
-            if (!String.IsNullOrWhiteSpace(MesssageSend.Text))
+            //List<Client> customerClientList = new List<Client>();
+            Client client = (Client)ListClients.SelectedItem;
+            List<Client> SelectedClientList = ListClients.SelectedItems.Cast<Client>().ToList();
+
+            if (!String.IsNullOrWhiteSpace(MesssageSend.Text) && ListClients.SelectedItem !=null)
             {
                 foreach (Socket item in listclient)
                 {
-                    Send(item);
+                    if (client != null && SelectedClientList.Count == 1)
+                    {
+                        if (client.Ip.Equals(item.RemoteEndPoint.ToString().Substring(0, item.RemoteEndPoint.ToString().IndexOf(':'))))
+                        {
+                            Send(item);
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < SelectedClientList.Count; i++)
+                        {
+                            if (SelectedClientList[i].Ip.Equals(item.RemoteEndPoint.ToString().Substring(0, item.RemoteEndPoint.ToString().IndexOf(':'))))
+                            {
+                                Send(item);
+                            }
+                        }
+                    }
+                   
                 }
+                //if (ListClients.SelectedItems.Count > 1)
+                //{
+                //    for (int i = 0; i < ListClients.SelectedItems.Count; i++)
+                //    {
+                //        customerClientList.Add((Client)ListClients.SelectedItems[i]);
+                //    }
+                //    foreach (Socket item in listclient)
+                //    {
+
+                //    }
+                //}
+                //foreach (Socket item in listclient)
+                //{
+                //    if (ListClients.SelectedItems.Count > 1)
+                //    {
+                //        Client itemclient = new Client();
+                //        if (itemclient.Ip.Equals(item.RemoteEndPoint.ToString().Substring(0, item.RemoteEndPoint.ToString().IndexOf(':'))))
+                //        {
+
+                //        }
+                //        //foreach (Client itemclient in customerClientList)
+                //        //{
+                //        //    if (itemclient.Ip.Equals(item.RemoteEndPoint.ToString().Substring(0, item.RemoteEndPoint.ToString().IndexOf(':'))))
+                //        //    {
+                //        //        Send(item);
+                //        //    }
+                //        //}
+                //    }
+                //    else
+                //    {
+                //        if (client.Ip.Equals(item.RemoteEndPoint.ToString().Substring(0, item.RemoteEndPoint.ToString().IndexOf(':'))))
+                //        {
+                //            Send(item);
+                //        }
+                //    }
+
+                //if (client.Ip.Equals(item.RemoteEndPoint.ToString().Substring(0, item.RemoteEndPoint.ToString().IndexOf(':'))))
+                //{
+                //    Send(item);
+                //}
+            }else
+            {
+                Growl.WarningGlobal("chưa nhập tin nhắn hoặc chưa chọn người cần gửi");
             }
-            
+
         }
         /// <summary>
         /// Hàm khởi tạo kết nối
@@ -167,7 +234,8 @@ namespace WPFChatServer
         private void AddClient(String message)
         {
             this.Dispatcher.Invoke(() => {
-                ListClients.Items.Add(GetHostnameFromIP(message));
+                var client = new Client(GetHostnameFromIP(message), message);
+                ListClients.Items.Add(client);
             });
         }
 
