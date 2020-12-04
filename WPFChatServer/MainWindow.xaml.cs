@@ -55,25 +55,19 @@ namespace WPFChatServer
 
             if (!String.IsNullOrWhiteSpace(MesssageSend.Text) && ListClients.SelectedItem !=null)
             {
+                //if (client != null && SelectedClientList.Count == 1)
+                //{
+                int i =0;
                 foreach (Socket item in listclient)
                 {
-                    if (client != null && SelectedClientList.Count == 1)
-                    {
-                        if (client.Ip.Equals(item.RemoteEndPoint.ToString().Substring(0, item.RemoteEndPoint.ToString().IndexOf(':'))))
+
+                    if (SelectedClientList[i].Ip.Equals(item.RemoteEndPoint.ToString().Substring(0, item.RemoteEndPoint.ToString().IndexOf(':'))))
                         {
-                            Send(item);
+                            Send(item, MesssageSend.Text);
                         }
-                    }
-                    else
-                    {
-                        for (int i = 0; i < SelectedClientList.Count; i++)
-                        {
-                            if (SelectedClientList[i].Ip.Equals(item.RemoteEndPoint.ToString().Substring(0, item.RemoteEndPoint.ToString().IndexOf(':'))))
-                            {
-                                Send(item);
-                            }
-                        }
-                    }
+                    i++;
+                    //}
+                    
                    
                 }
                 //if (ListClients.SelectedItems.Count > 1)
@@ -168,12 +162,12 @@ namespace WPFChatServer
         /// Hàm gửi message
         /// </summary>
         /// <param name="client">truyền vào Socket cần gửi</param>
-        private void Send(Socket client)
+        private void Send(Socket client, String message)
         {
             if (!MesssageSend.Equals(null))
             {
-                client.Send(Serialize(IPHost.HostName.ToString() + ": " + MesssageSend.Text));
-                AddMessage(IPHost.HostName.ToString() + ": " + MesssageSend.Text);
+                client.Send(Serialize(IPHost.HostName.ToString() + ": " + message));
+                AddMessage(IPHost.HostName.ToString() + ": " + message);
             }
         }
 
@@ -247,7 +241,7 @@ namespace WPFChatServer
         {
             this.Dispatcher.Invoke(() => {
                 Message.Items.Add(message);
-                MesssageSend.Clear();
+                //MesssageSend.Clear();
                 Message.Items.MoveCurrentToLast();
                 Message.ScrollIntoView(Message.Items.CurrentItem);
             });

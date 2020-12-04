@@ -10,7 +10,19 @@ namespace WPFChatServer.ClientModel
     public class Client
     {
         String hostname;
+
+        public String Hostname
+        {
+            get { return hostname; }
+            set { hostname = value; }
+        }
         String ip;
+
+        public String Ip
+        {
+            get { return ip; }
+            set { ip = value; }
+        }
 
         public Client(){}
         public Client(string hostname, String ip)
@@ -23,8 +35,8 @@ namespace WPFChatServer.ClientModel
             Hostname = hostname;
         }
 
-        public string Hostname { get => hostname; set => hostname = value; }
-        public String Ip { get => ip; set => ip = value; }
+        //public string Hostname { get => hostname; set => hostname = value; }
+        //public String Ip { get => ip; set => ip = value; }
 
         public override string ToString()
         {
