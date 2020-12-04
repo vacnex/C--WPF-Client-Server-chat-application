@@ -33,7 +33,6 @@ namespace WPFChatServer
         Socket sServer;
         IPEndPoint IP;
         List<Socket> listclient;
-        
         IPHostEntry IPHost;
         public MainWindow()
         {
@@ -49,72 +48,18 @@ namespace WPFChatServer
 
         private void btnSend_Click(object sender, RoutedEventArgs e)
         {
-            //List<Client> customerClientList = new List<Client>();
-            Client client = (Client)ListClients.SelectedItem;
             List<Client> SelectedClientList = ListClients.SelectedItems.Cast<Client>().ToList();
-
-            if (!String.IsNullOrWhiteSpace(MesssageSend.Text) && ListClients.SelectedItem !=null)
-            {
-                //if (client != null && SelectedClientList.Count == 1)
-                //{
+            if (!String.IsNullOrWhiteSpace(MesssageSend.Text) && ListClients.SelectedItem !=null) {
                 int i =0;
-                foreach (Socket item in listclient)
-                {
-
-                    if (SelectedClientList[i].Ip.Equals(item.RemoteEndPoint.ToString().Substring(0, item.RemoteEndPoint.ToString().IndexOf(':'))))
-                        {
-                            Send(item, MesssageSend.Text);
-                        }
+                foreach (Socket item in listclient){
+                    if (SelectedClientList[i].Ip.Equals(item.RemoteEndPoint.ToString().Substring(0, item.RemoteEndPoint.ToString().IndexOf(':')))) {
+                        Send(item, MesssageSend.Text);
+                    }
                     i++;
-                    //}
-                    
-                   
                 }
-                //if (ListClients.SelectedItems.Count > 1)
-                //{
-                //    for (int i = 0; i < ListClients.SelectedItems.Count; i++)
-                //    {
-                //        customerClientList.Add((Client)ListClients.SelectedItems[i]);
-                //    }
-                //    foreach (Socket item in listclient)
-                //    {
-
-                //    }
-                //}
-                //foreach (Socket item in listclient)
-                //{
-                //    if (ListClients.SelectedItems.Count > 1)
-                //    {
-                //        Client itemclient = new Client();
-                //        if (itemclient.Ip.Equals(item.RemoteEndPoint.ToString().Substring(0, item.RemoteEndPoint.ToString().IndexOf(':'))))
-                //        {
-
-                //        }
-                //        //foreach (Client itemclient in customerClientList)
-                //        //{
-                //        //    if (itemclient.Ip.Equals(item.RemoteEndPoint.ToString().Substring(0, item.RemoteEndPoint.ToString().IndexOf(':'))))
-                //        //    {
-                //        //        Send(item);
-                //        //    }
-                //        //}
-                //    }
-                //    else
-                //    {
-                //        if (client.Ip.Equals(item.RemoteEndPoint.ToString().Substring(0, item.RemoteEndPoint.ToString().IndexOf(':'))))
-                //        {
-                //            Send(item);
-                //        }
-                //    }
-
-                //if (client.Ip.Equals(item.RemoteEndPoint.ToString().Substring(0, item.RemoteEndPoint.ToString().IndexOf(':'))))
-                //{
-                //    Send(item);
-                //}
-            }else
-            {
+            } else {
                 Growl.WarningGlobal("chưa nhập tin nhắn hoặc chưa chọn người cần gửi");
             }
-
         }
         /// <summary>
         /// Hàm khởi tạo kết nối
@@ -127,10 +72,8 @@ namespace WPFChatServer
             IPHost = Dns.GetHostEntry(Dns.GetHostName());
             sServer.Bind(IP);
             Thread t = new Thread(() => {
-                try
-                {
-                    while (true)
-                    {
+                try{
+                    while (true){
                         sServer.Listen(10);
                         Socket client = sServer.Accept();
                         listclient.Add(client);
@@ -139,8 +82,7 @@ namespace WPFChatServer
                         r.Start(client);
                     }
                 }
-                catch (Exception)
-                {
+                catch (Exception) {
                     IP = new IPEndPoint(IPAddress.Any, 9999);
                     sServer = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
                 }
@@ -162,10 +104,10 @@ namespace WPFChatServer
         /// Hàm gửi message
         /// </summary>
         /// <param name="client">truyền vào Socket cần gửi</param>
+        /// /// <param name="message">truyền vào Message cần gửi</param>
         private void Send(Socket client, String message)
         {
-            if (!MesssageSend.Equals(null))
-            {
+            if (!MesssageSend.Equals(null)){
                 client.Send(Serialize(IPHost.HostName.ToString() + ": " + message));
                 AddMessage(IPHost.HostName.ToString() + ": " + message);
             }
@@ -178,10 +120,8 @@ namespace WPFChatServer
         private void Recieve(Object obj)
         {
             Socket client = obj as Socket;
-            try
-            {
-                while (true)
-                {
+            try{
+                while (true){
                     byte[] data = new byte[1024];
                     client.Receive(data);
                     String message = (String)Deserialize(data);
@@ -192,24 +132,12 @@ namespace WPFChatServer
                         AddMessage(message);
                 }
             }
-            catch (Exception)
-            {
+            catch (Exception){
                 listclient.Remove(client);
                 client.Close();
             }
         }
         
-        /// <summary>
-        /// Hàm lấy hostname từ ip
-        /// </summary>
-        /// <param name="ip">Truyền vào địa chỉ ip</param>
-        /// <returns>Trả về Hostname của ip</returns>
-        private String GetHostnameFromIP(String ip)
-        {
-            IPHostEntry hostEntry = Dns.GetHostEntry(ip);
-            return hostEntry.HostName;
-        }
-
         /// <summary>
         /// Hàm kiểm tra IP
         /// </summary>
@@ -234,6 +162,17 @@ namespace WPFChatServer
         }
 
         /// <summary>
+        /// Hàm lấy hostname từ ip
+        /// </summary>
+        /// <param name="ip">Truyền vào địa chỉ ip</param>
+        /// <returns>Trả về Hostname của ip</returns>
+        private String GetHostnameFromIP(String ip)
+        {
+            IPHostEntry hostEntry = Dns.GetHostEntry(ip);
+            return hostEntry.HostName;
+        }
+
+        /// <summary>
         /// Hàm thêm message vào listbox
         /// </summary>
         /// <param name="message">Truyền vào message</param>
@@ -241,7 +180,6 @@ namespace WPFChatServer
         {
             this.Dispatcher.Invoke(() => {
                 Message.Items.Add(message);
-                //MesssageSend.Clear();
                 Message.Items.MoveCurrentToLast();
                 Message.ScrollIntoView(Message.Items.CurrentItem);
             });
