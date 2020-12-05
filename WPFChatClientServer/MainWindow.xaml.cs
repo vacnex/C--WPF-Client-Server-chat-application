@@ -18,6 +18,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WPFChatServer.ClientModel;
 
 namespace WPFChatClientServer
 {
@@ -115,7 +116,10 @@ namespace WPFChatClientServer
                     String message = (String)Deserialize(data);
                     if (!message.Contains("\0"))
                     {
-                        AddMessage(message);
+                        if (isListIpAddress(message))
+                            UpdateClient(message);
+                        else
+                            AddMessage(message);
                     }
                 }
             }
@@ -124,6 +128,44 @@ namespace WPFChatClientServer
                 Close();
             }
         }
+
+        private void UpdateClient(string message)
+        {
+            this.Dispatcher.Invoke(() => {
+                List<String> ListIpClient = message.Split(',').ToList();
+                ListIpClient.RemoveAll(x => string.IsNullOrEmpty(x));
+                ListClients.Items.Clear();
+                for (int i = 0; i < ListIpClient.Count; i++)
+                {
+                    var client = new Client(GetHostnameFromIP(ListIpClient[i]), ListIpClient[i]);
+                    if (client.Ip != sClient.LocalEndPoint.ToString().Substring(0, sClient.LocalEndPoint.ToString().IndexOf(':')))
+                        ListClients.Items.Add(client);
+                }
+                
+            });
+        }
+
+        /// <summary>
+        /// Kiểm tra message gửi về có phải là chuỗi các ip của client đã kết nối
+        /// </summary>
+        /// <param name="message">Message gửi về</param>
+        /// <returns>Trả về truê nếu message đó là danh sách ip, ngược lài là false</returns>
+        private bool isListIpAddress(string message)
+        {
+            return message.Contains(",");
+        }
+
+        /// <summary>
+        /// Hàm lấy hostname từ ip
+        /// </summary>
+        /// <param name="ip">Truyền vào địa chỉ ip</param>
+        /// <returns>Trả về Hostname của ip</returns>
+        private string GetHostnameFromIP(string ip)
+        {
+            IPHostEntry hostEntry = Dns.GetHostEntry(ip);
+            return hostEntry.HostName;
+        }
+
 
         /// <summary>
         /// Hàm thêm message vào listbox

@@ -50,12 +50,21 @@ namespace WPFChatServer
         {
             List<Client> SelectedClientList = ListClients.SelectedItems.Cast<Client>().ToList();
             if (!String.IsNullOrWhiteSpace(MesssageSend.Text) && ListClients.SelectedItem !=null) {
-                int i =0;
+                int i = 0;
+                String clientip = String.Empty;
                 foreach (Socket item in listclient){
-                    if (SelectedClientList[i].Ip.Equals(item.RemoteEndPoint.ToString().Substring(0, item.RemoteEndPoint.ToString().IndexOf(':')))) {
-                        Send(item, MesssageSend.Text);
+                    clientip = item.RemoteEndPoint.ToString().Substring(0, item.RemoteEndPoint.ToString().IndexOf(':'));
+                    if (SelectedClientList.Count > 1)
+                    {
+                        if (SelectedClientList[i].Ip.Equals(clientip))
+                        {
+                            Send(item, MesssageSend.Text);
+                        }
+                        i++;
                     }
-                    i++;
+                    else if (SelectedClientList.Count <= 1)
+                        if (SelectedClientList[0].Ip.Equals(clientip))
+                            Send(item, MesssageSend.Text);
                 }
             } else {
                 Growl.WarningGlobal("chưa nhập tin nhắn hoặc chưa chọn người cần gửi");
@@ -117,6 +126,7 @@ namespace WPFChatServer
         /// Hạm nhận
         /// </summary>
         /// <param name="obj">Truyền vào Object nhận được</param>
+        String IPlist = String.Empty;
         private void Recieve(Object obj)
         {
             Socket client = obj as Socket;
@@ -127,12 +137,21 @@ namespace WPFChatServer
                     String message = (String)Deserialize(data);
                     //AddMessage(message);
                     if (isIpAddress(message))
+                    {
                         AddClient(message);
+                        IPlist += message + ",";
+                        foreach (Socket item in listclient)
+                        {
+                            item.Send(Serialize(IPlist));
+                        }
+                    }
                     else
+                    {
                         AddMessage(message);
+                    }
                 }
             }
-            catch (Exception){
+            catch (Exception e){
                 listclient.Remove(client);
                 client.Close();
             }
@@ -143,10 +162,10 @@ namespace WPFChatServer
         /// </summary>
         /// <param name="iphost">Truyền vào IP</param>
         /// <returns>Trả về true/false</returns>
-        private bool isIpAddress (String iphost)
+        private bool isIpAddress (String message)
         {
             IPAddress ip;
-            return IPAddress.TryParse(iphost, out ip);
+            return IPAddress.TryParse(message, out ip);
         }
 
         /// <summary>

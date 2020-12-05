@@ -8,23 +8,35 @@
         xmlns:system="clr-namespace:System;assembly=mscorlib"
         Title="Chat Client Demo" 
         WindowStyle="None"
-        WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip" Padding="0" Width="800" Height="600" Closed="Window_Closed">
+        WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip" Padding="0" Width="1000" Height="600" Closed="Window_Closed">
     <Grid Background="{StaticResource CloudDrawingBrush}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="16*"/>
-            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="Auto" MinWidth="380"/>
+
+            <ColumnDefinition Width="38*"/>
+            <ColumnDefinition Width="115*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="70*"/>
             <RowDefinition Height="390*"/>
             <RowDefinition Height="67*"/>
         </Grid.RowDefinitions>
-        <TextBox hc:InfoElement.Necessary="True" x:Name="ipbox" Grid.Row="0" Grid.Column="0"  Margin="10" FontSize="22" Text="127.0.0.1" />
-        <Button x:Name="btnConnect" Style="{StaticResource ButtonPrimary}" Content="Connect" hc:BorderElement.CornerRadius="10" HorizontalAlignment="Stretch" Grid.Column="1" Grid.Row="0" Height="Auto" Click="btnConnect_Click" VerticalAlignment="Stretch" FontSize="22" FontWeight="Bold" Margin="10" />
-        <ListBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="Message" Margin="10" FontSize="22" VerticalContentAlignment="Stretch" >
-        </ListBox>
-        <TextBox x:Name="MesssageSend" Grid.Row="2" Grid.Column="0" Margin="10" FontSize="22"/>
-        <Button IsDefault="true" x:Name="btnSend" Style="{StaticResource ButtonPrimary}" Content="Send" hc:BorderElement.CornerRadius="10" HorizontalAlignment="Stretch" Grid.Column="1" Grid.Row="2" Height="Auto" Click="btnSend_Click" VerticalAlignment="Stretch" FontSize="22" FontWeight="Bold" Margin="10" />
+        <TextBox hc:InfoElement.Necessary="True" x:Name="ipbox" Grid.Row="0" Grid.Column="0"  Margin="10,10,0,10" FontSize="22" Text="127.0.0.1" />
+        <Button x:Name="btnConnect" Style="{StaticResource ButtonPrimary}"  Content="Connect" hc:BorderElement.CornerRadius="10" HorizontalAlignment="Stretch" Grid.Column="1" Grid.Row="0" Height="Auto" Click="btnConnect_Click" VerticalAlignment="Stretch" FontSize="22" FontWeight="Bold" Margin="5,19,15,19" />
+        <ListBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="Message" Margin="10" FontSize="22" VerticalContentAlignment="Stretch" />
+        <DataGrid  Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" x:Name="ListClients"  Margin="10" VerticalContentAlignment="Stretch" HeadersVisibility="All" RowHeaderWidth="60" AutoGenerateColumns="False">
+            <DataGrid.RowHeaderTemplate>
+                <DataTemplate>
+                    <CheckBox IsChecked="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=DataGridRow}}"/>
+                </DataTemplate>
+            </DataGrid.RowHeaderTemplate>
+            <DataGrid.Columns>
+                <DataGridTextColumn IsReadOnly="True"  Binding="{Binding Hostname}" Header="Hostname"/>
+                <DataGridTextColumn IsReadOnly="True" Binding="{Binding Ip}" Header="IP"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <TextBox x:Name="MesssageSend" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="10" FontSize="22"/>
+        <Button IsDefault="true" x:Name="btnSend" Style="{StaticResource ButtonPrimary}" Content="Send" hc:BorderElement.CornerRadius="10" HorizontalAlignment="Stretch" Grid.Column="2" Grid.Row="2" Height="Auto" Click="btnSend_Click" VerticalAlignment="Stretch" FontSize="22" FontWeight="Bold" Margin="10" />
 
     </Grid>
 </Window>
