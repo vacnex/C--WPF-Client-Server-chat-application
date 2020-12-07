@@ -50,9 +50,10 @@ namespace WPFChatClientServer
         {
             if (!String.IsNullOrWhiteSpace(MesssageSend.Text))
             {
-                Send();
-                AddMessage(IPHost.HostName.ToString() + ": " + MesssageSend.Text);
+                Send(sClient,MesssageSend.Text);
             }
+            else
+                Growl.WarningGlobal("chưa nhập tin nhắn hoặc chưa chọn người cần gửi");
         }
         
         /// <summary>
@@ -73,6 +74,7 @@ namespace WPFChatClientServer
                     if (item.AddressFamily == AddressFamily.InterNetwork)
                         sClient.Send(Serialize(item.ToString()));
                 }
+
                 sClient.Send(Serialize(IPHost.HostName.ToString()+" da ket noi"));
             }
             catch (Exception)
@@ -96,11 +98,10 @@ namespace WPFChatClientServer
         /// <summary>
         /// Hàm gửi
         /// </summary>
-        private void Send()
+        private void Send(Socket client,String message)
         {
-            sClient.Send(Serialize(IPHost.HostName.ToString() + ": " + MesssageSend.Text));
+            client.Send(Serialize(IPHost.HostName.ToString() + ": " + message));
         }
-
 
         /// <summary>
         /// Hàm nhận
@@ -129,6 +130,10 @@ namespace WPFChatClientServer
             }
         }
 
+        /// <summary>
+        /// Hàm cập nhật client vào Datagrid
+        /// </summary>
+        /// <param name="message">Message chứa ip client</param>
         private void UpdateClient(string message)
         {
             this.Dispatcher.Invoke(() => {
@@ -199,13 +204,14 @@ namespace WPFChatClientServer
         /// Hàm chuyển đổi mảng byte về string
         /// </summary>
         /// <param name="data">Truyền mảng byte</param>
-        /// <returns></returns>
+        /// <returns>Trả về giá trị của mảng byte truyền vào</returns>
         private Object Deserialize(byte[] data)
         {
             ms = new MemoryStream(data);
             BinaryFormatter fn = new BinaryFormatter();
             return fn.Deserialize(ms);
         }
+        
         /// <summary>
         /// Hàm đóng kết nối khi cửa sổ đóng.
         /// </summary>

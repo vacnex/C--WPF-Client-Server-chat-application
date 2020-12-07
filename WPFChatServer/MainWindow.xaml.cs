@@ -66,9 +66,8 @@ namespace WPFChatServer
                         if (SelectedClientList[0].Ip.Equals(clientip))
                             Send(item, MesssageSend.Text);
                 }
-            } else {
+            } else
                 Growl.WarningGlobal("chưa nhập tin nhắn hoặc chưa chọn người cần gửi");
-            }
         }
         /// <summary>
         /// Hàm khởi tạo kết nối
@@ -135,7 +134,6 @@ namespace WPFChatServer
                     byte[] data = new byte[1024];
                     client.Receive(data);
                     String message = (String)Deserialize(data);
-                    //AddMessage(message);
                     if (isIpAddress(message))
                     {
                         AddClient(message);
@@ -146,9 +144,7 @@ namespace WPFChatServer
                         }
                     }
                     else
-                    {
                         AddMessage(message);
-                    }
                 }
             }
             catch (Exception e){
@@ -158,7 +154,7 @@ namespace WPFChatServer
         }
         
         /// <summary>
-        /// Hàm kiểm tra IP
+        /// Hàm kiểm tra IP hợp lệ
         /// </summary>
         /// <param name="iphost">Truyền vào IP</param>
         /// <returns>Trả về true/false</returns>
@@ -171,7 +167,7 @@ namespace WPFChatServer
         /// <summary>
         /// Hàm thêm client 
         /// </summary>
-        /// <param name="message">truyền vào massage chứa client</param>
+        /// <param name="message">truyền vào massage chứa ip client</param>
         private void AddClient(String message)
         {
             this.Dispatcher.Invoke(() => {
